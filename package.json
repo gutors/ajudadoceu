@@ -2,6 +2,7 @@
   "name": "ajuda-ceu-react",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://applua.fengshuiedecoracao.com.br",
   "type": "module",
   "scripts": {
     "dev": "vite",
