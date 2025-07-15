@@ -1,3 +1,4 @@
+import { supabase } from './lib/supabaseClient';
 import React, { useState, useEffect } from 'react';
 import './App.css';
 import { AstrologicalData, DailyData, LFCPeriod, MercurioRetrogrado, Eclipse } from './types';
@@ -41,11 +42,64 @@ function App() {
   const [currentYear, setCurrentYear] = useState<number>(new Date().getFullYear());
   const [resultadoConsulta, setResultadoConsulta] = useState<{ message: string; isFavorable: boolean } | null>(null);
   const [detalhesAstrologicos, setDetalhesAstrologicos] = useState<DailyData | null>(null);
+  const [isLoginView, setIsLoginView] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
+  const [user, setUser] = useState(null);
 
   const mesesNomes = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
   ];
+
+  useEffect(() => {
+    const session = supabase.auth.getSession();
+    setUser(session?.user ?? null);
+
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setUser(session?.user ?? null);
+      }
+    );
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
+  }, []);
+
+  async function handleSignUp(e) {
+    e.preventDefault();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          full_name: name,
+        },
+      },
+    });
+    if (error) {
+      alert(error.message);
+    } else {
+      alert('Cadastro realizado com sucesso! Verifique seu e-mail para confirmar.');
+    }
+  }
+
+  async function handleSignIn(e) {
+    e.preventDefault();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+    if (error) {
+      alert(error.message);
+    }
+  }
+
+  async function handleSignOut() {
+    await supabase.auth.signOut();
+  }
 
   useEffect(() => {
     carregarDados().then(() => {
@@ -254,6 +308,7 @@ function App() {
         <button className={`tab ${activeTab === 'consulta' ? 'active' : ''}`} onClick={() => openTab('consulta')}>Consulta</button>
         <button className={`tab ${activeTab === 'calendario' ? 'active' : ''}`} onClick={() => openTab('calendario')}>Calendário</button>
         <button className={`tab ${activeTab === 'info' ? 'active' : ''}`} onClick={() => openTab('info')}>Info</button>
+        <button className={`tab ${activeTab === 'login' ? 'active' : ''}`} onClick={() => openTab('login')}>Login</button>
       </div>
 
       <div id="consulta" className={`tab-content ${activeTab === 'consulta' ? 'active' : ''}`}>
@@ -363,6 +418,67 @@ function App() {
           <p><strong>Plutão em Aquário:</strong> Início de uma nova era voltada ao coletivo, inovação e quebra de paradigmas antigos.</p>
           <p><strong>Júpiter em Gêmeos (até 10/06):</strong> Expansão pela curiosidade, ótimo para estudos e comunicação.</p>
           <p><strong>Urano em Gêmeos (07/07 a 07/11):</strong> Tecnologia e reinvenção das ideias.</p>
+        </div>
+      </div>
+
+      <div id="login" className={`tab-content ${activeTab === 'login' ? 'active' : ''}`}>
+        <div className="consulta-card">
+          {user ? (
+            <div>
+              <h1>Bem-vindo, {user.email}</h1>
+              <button onClick={handleSignOut} className="btn">Sair</button>
+            </div>
+          ) : (
+            <div>
+              {isLoginView ? (
+                <div>
+                  <h1>Login</h1>
+                  <form onSubmit={handleSignIn}>
+                    <div className="form-group">
+                      <label htmlFor="login-email">Email:</label>
+                      <input type="email" id="login-email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="login-password">Senha:</label>
+                      <input type="password" id="login-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    </div>
+                    <button type="submit" className="btn">Entrar</button>
+                  </form>
+                  <p style={{ textAlign: 'center', marginTop: '1rem' }}>
+                    Não tem uma conta?{' '}
+                    <a href="#" onClick={() => setIsLoginView(false)} style={{ color: 'var(--cor-destaque)' }}>
+                      Cadastre-se
+                    </a>
+                  </p>
+                </div>
+              ) : (
+                <div>
+                  <h1>Cadastro</h1>
+                  <form onSubmit={handleSignUp}>
+                    <div className="form-group">
+                      <label htmlFor="register-name">Nome:</label>
+                      <input type="text" id="register-name" value={name} onChange={(e) => setName(e.target.value)} required />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="register-email">Email:</label>
+                      <input type="email" id="register-email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                    </div>
+                    <div className="form-group">
+                      <label htmlFor="register-password">Senha:</label>
+                      <input type="password" id="register-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                    </div>
+                    <button type="submit" className="btn">Cadastrar</button>
+                  </form>
+                  <p style={{ textAlign: 'center', marginTop: '1rem' }}>
+                    Já tem uma conta?{' '}
+                    <a href="#" onClick={() => setIsLoginView(true)} style={{ color: 'var(--cor-destaque)' }}>
+                      Faça login
+                    </a>
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 

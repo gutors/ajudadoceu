@@ -139,7 +139,10 @@ label {
     font-size: 16px;
 }
 
-input[type="date"] {
+input[type="date"],
+input[type="text"],
+input[type="email"],
+input[type="password"] {
     width: 100%;
     padding: 12px;
     border: 2px solid var(--cor-secundaria);
@@ -150,7 +153,10 @@ input[type="date"] {
     transition: all 0.3s ease;
 }
 
-input[type="date"]:focus {
+input[type="date"]:focus,
+input[type="text"]:focus,
+input[type="email"]:focus,
+input[type="password"]:focus {
     border-color: var(--cor-destaque);
     outline: none;
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
