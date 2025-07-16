@@ -295,6 +295,62 @@ function App() {
     });
   };
 
+  if (!user) {
+    return (
+      <div className="container">
+        <header>
+          <a href="#" className="logo">
+            <img src={luaIcon} alt="Lua" width="40" height="40" />
+            Ajuda do <span>Céu</span>
+          </a>
+        </header>
+        <div className="consulta-card" style={{ margin: '20px' }}>
+          {isLoginView ? (
+            <div>
+              <h1>Login</h1>
+              <form onSubmit={handleSignIn}>
+                <div className="form-group">
+                  <label htmlFor="login-email">Email:</label>
+                  <input type="email" id="login-email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="login-password">Senha:</label>
+                  <input type="password" id="login-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                </div>
+                <button type="submit" className="btn">Entrar</button>
+              </form>
+            </div>
+          ) : (
+            <div>
+              <h1>Cadastro</h1>
+              <form onSubmit={handleSignUp}>
+                <div className="form-group">
+                  <label htmlFor="register-name">Nome:</label>
+                  <input type="text" id="register-name" value={name} onChange={(e) => setName(e.target.value)} required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="register-email">Email:</label>
+                  <input type="email" id="register-email" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="register-password">Senha:</label>
+                  <input type="password" id="register-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                </div>
+                <button type="submit" className="btn">Cadastrar</button>
+              </form>
+              <p style={{ textAlign: 'center', marginTop: '1rem' }}>
+                Já tem uma conta?{' '}
+                <a href="#" onClick={() => setIsLoginView(true)} style={{ color: 'var(--cor-destaque)' }}>
+                  Faça login
+                </a>
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="container">
       <header>
@@ -308,7 +364,7 @@ function App() {
         <button className={`tab ${activeTab === 'consulta' ? 'active' : ''}`} onClick={() => openTab('consulta')}>Consulta</button>
         <button className={`tab ${activeTab === 'calendario' ? 'active' : ''}`} onClick={() => openTab('calendario')}>Calendário</button>
         <button className={`tab ${activeTab === 'info' ? 'active' : ''}`} onClick={() => openTab('info')}>Info</button>
-        <button className={`tab ${activeTab === 'login' ? 'active' : ''}`} onClick={() => openTab('login')}>Login</button>
+        <button className="tab" onClick={handleSignOut}>Sair</button>
       </div>
 
       <div id="consulta" className={`tab-content ${activeTab === 'consulta' ? 'active' : ''}`}>
@@ -418,67 +474,6 @@ function App() {
           <p><strong>Plutão em Aquário:</strong> Início de uma nova era voltada ao coletivo, inovação e quebra de paradigmas antigos.</p>
           <p><strong>Júpiter em Gêmeos (até 10/06):</strong> Expansão pela curiosidade, ótimo para estudos e comunicação.</p>
           <p><strong>Urano em Gêmeos (07/07 a 07/11):</strong> Tecnologia e reinvenção das ideias.</p>
-        </div>
-      </div>
-
-      <div id="login" className={`tab-content ${activeTab === 'login' ? 'active' : ''}`}>
-        <div className="consulta-card">
-          {user ? (
-            <div>
-              <h1>Bem-vindo, {user.email}</h1>
-              <button onClick={handleSignOut} className="btn">Sair</button>
-            </div>
-          ) : (
-            <div>
-              {isLoginView ? (
-                <div>
-                  <h1>Login</h1>
-                  <form onSubmit={handleSignIn}>
-                    <div className="form-group">
-                      <label htmlFor="login-email">Email:</label>
-                      <input type="email" id="login-email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="login-password">Senha:</label>
-                      <input type="password" id="login-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                    </div>
-                    <button type="submit" className="btn">Entrar</button>
-                  </form>
-                  <p style={{ textAlign: 'center', marginTop: '1rem' }}>
-                    Não tem uma conta?{' '}
-                    <a href="#" onClick={() => setIsLoginView(false)} style={{ color: 'var(--cor-destaque)' }}>
-                      Cadastre-se
-                    </a>
-                  </p>
-                </div>
-              ) : (
-                <div>
-                  <h1>Cadastro</h1>
-                  <form onSubmit={handleSignUp}>
-                    <div className="form-group">
-                      <label htmlFor="register-name">Nome:</label>
-                      <input type="text" id="register-name" value={name} onChange={(e) => setName(e.target.value)} required />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="register-email">Email:</label>
-                      <input type="email" id="register-email" value={email} onChange={(e) => setEmail(e.target.value)} required />
-                    </div>
-                    <div className="form-group">
-                      <label htmlFor="register-password">Senha:</label>
-                      <input type="password" id="register-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-                    </div>
-                    <button type="submit" className="btn">Cadastrar</button>
-                  </form>
-                  <p style={{ textAlign: 'center', marginTop: '1rem' }}>
-                    Já tem uma conta?{' '}
-                    <a href="#" onClick={() => setIsLoginView(true)} style={{ color: 'var(--cor-destaque)' }}>
-                      Faça login
-                    </a>
-                  </p>
-                </div>
-              )}
-            </div>
-          )}
         </div>
       </div>
 
