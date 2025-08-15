@@ -1,0 +1,69 @@
+# Nome do Workflow - Irá aparecer na aba "Actions" do seu repositório
+name: Deploy para Hostinger via FTP
+
+# Define o gatilho (trigger) do workflow
+on:
+  push:
+    branches:
+      - main  # Pode alterar para "main" se for o seu branch principal
+
+# Define os trabalhos (jobs) a serem executados
+jobs:
+  build-and-deploy:
+    # O tipo de máquina virtual a ser usada
+    runs-on: ubuntu-latest
+
+    # Os passos que o trabalho irá executar em sequência
+    steps:
+      # Passo 1: Faz o checkout do seu código do repositório para a máquina virtual
+      - name: Checkout do Código
+        uses: actions/checkout@v4
+
+      # Passo 2: Configura o PNPM para gestão de pacotes
+      - name: Configurar PNPM
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10 # Pode ajustar para a sua versão do pnpm
+
+      # Passo 3: Configura o ambiente Node.js
+      - name: Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24' # Especifique a versão do Node.js que o seu projeto usa
+          cache: 'pnpm' # Ativa o cache para acelerar instalações futuras
+
+      # Passo 4: Instala as dependências do projeto
+      - name: Instalar Dependências
+        run: pnpm install
+
+      # Passo 5: Executa o build do projeto para gerar a pasta /dist
+      - name: Build do Projeto
+        run: pnpm run build
+        env:
+          VITE_CLIENT_API_KEY: ${{ secrets.VITE_CLIENT_API_KEY }}
+          VITE_SUPABASE_API_KEY: ${{ secrets.VITE_SUPABASE_API_KEY }}
+
+      # Passo 6: Faz o deploy dos ficheiros para o servidor FTP
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+        with:
+          # Endereço do servidor FTP, obtido do secret que configurou
+          server: ${{ secrets.FTP_SERVER }}
+          
+          # Utilizador do FTP, obtido do secret
+          username: ${{ secrets.FTP_USERNAME }}
+          
+          # Palavra-passe do FTP, obtida do secret
+          password: ${{ secrets.FTP_PASSWORD }}
+          
+          # A pasta local que contém os ficheiros a serem enviados (resultado do build)
+          local-dir: ./dist/
+          
+          # A pasta de destino no servidor FTP.
+          # Ex: 'public_html/'. Se o seu projeto deve ir para uma subpasta,
+          # use algo como 'public_html/meu-projeto-1/'
+          server-dir: /ajudadoceu/
+          
+          # Opção para limpar ficheiros no destino que não existem na origem
+          # Útil para remover ficheiros antigos que já não são necessários
+          dangerous-clean-slate: true
