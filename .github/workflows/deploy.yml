@@ -40,8 +40,8 @@ jobs:
       - name: Build do Projeto
         run: pnpm run build
         env:
-          VITE_CLIENT_API_KEY: ${{ secrets.VITE_CLIENT_API_KEY }}
-          VITE_SUPABASE_API_KEY: ${{ secrets.VITE_SUPABASE_API_KEY }}
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
 
       # Passo 6: Faz o deploy dos ficheiros para o servidor FTP
       - name: Deploy via FTP
@@ -62,7 +62,7 @@ jobs:
           # A pasta de destino no servidor FTP.
           # Ex: 'public_html/'. Se o seu projeto deve ir para uma subpasta,
           # use algo como 'public_html/meu-projeto-1/'
-          server-dir: /ajudadoceu/
+          server-dir: /
           
           # Opção para limpar ficheiros no destino que não existem na origem
           # Útil para remover ficheiros antigos que já não são necessários
