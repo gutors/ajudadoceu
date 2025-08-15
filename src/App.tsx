@@ -450,7 +450,7 @@ function App() {
       <div id="info" className={`tab-content ${activeTab === 'info' ? 'active' : ''}`}>
         <div className="info-card">
           <h3>Lua Fora de Curso</h3>
-          <p>Período em que a Lua não faz aspectos com outros planetas antes de mudar de signo. Não é recomendado iniciar projetos importantes ou tomar decisões cruciais.</p>
+          <p>Período em que a Lua não faz aspectos com outros planetas antes de mudar de signo. <br/> Não é recomendado iniciar projetos importantes ou tomar decisões cruciais.</p>
         </div>
 
         <div className="info-card">
