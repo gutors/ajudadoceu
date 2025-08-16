@@ -66,4 +66,4 @@ jobs:
           
           # Opção para limpar ficheiros no destino que não existem na origem
           # Útil para remover ficheiros antigos que já não são necessários
-          dangerous-clean-slate: true
+          dangerous-clean-slate: false
