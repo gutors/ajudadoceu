@@ -1,8 +1,10 @@
 import { supabase } from './lib/supabaseClient';
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import { AstrologicalData, DailyData, LFCPeriod, MercurioRetrogrado, Eclipse } from './types';
 import luaIcon from './assets/lua-icon.png';
+import { SetPasswordPage } from './components/SetPasswordPage';
 
 // Dados astrológicos diários completos (serão carregados de um JSON)
 let dadosDiarios: AstrologicalData | null = null;
@@ -35,7 +37,7 @@ function getFaseLuaEmoji(fase: string): string {
   }
 }
 
-function App() {
+function MainApp() {
   const [activeTab, setActiveTab] = useState<string>('consulta');
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [currentMonth, setCurrentMonth] = useState<number>(new Date().getMonth());
@@ -481,6 +483,17 @@ function App() {
         &copy; 2025 Ajuda do Céu | Baseado no ebook de <span className="author">Letícia Andrade</span>
       </footer>
     </div>
+  );
+}
+
+function App() {
+  return (
+    <Router>
+      <Routes>
+        <Route path="/set-password" element={<SetPasswordPage />} />
+        <Route path="/*" element={<MainApp />} />
+      </Routes>
+    </Router>
   );
 }
 
