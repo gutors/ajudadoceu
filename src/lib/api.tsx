@@ -25,3 +25,13 @@ export async function updateUserPassword(data: UpdatePasswordData): Promise<any>
 
   return responseData;
 }
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: 'https://applua.fengshuiedecoracao.com.br/set-password',
+  });
+
+  if (error) {
+    throw new Error(error.message || "Ocorreu um erro ao solicitar a redefinição de senha.");
+  }
+}

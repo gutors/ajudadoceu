@@ -1,10 +1,11 @@
 import { supabase } from './lib/supabaseClient';
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import './App.css';
 import { AstrologicalData, DailyData, LFCPeriod, MercurioRetrogrado, Eclipse } from './types';
 import luaIcon from './assets/lua-icon.png';
 import { SetPasswordPage } from './components/SetPasswordPage';
+import { ForgotPasswordPage } from './components/ForgotPasswordPage';
 
 // Dados astrológicos diários completos (serão carregados de um JSON)
 let dadosDiarios: AstrologicalData | null = null;
@@ -320,6 +321,11 @@ function MainApp() {
                   <input type="password" id="login-password" value={password} onChange={(e) => setPassword(e.target.value)} required />
                 </div>
                 <button type="submit" className="btn">Entrar</button>
+                <p style={{ textAlign: 'center', marginTop: '1rem' }}>
+                  <Link to="/forgot-password" style={{ color: 'var(--cor-destaque)' }}>
+                    Esqueci minha senha
+                  </Link>
+                </p>
               </form>
             </div>
           ) : (
@@ -491,6 +497,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/set-password" element={<SetPasswordPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/*" element={<MainApp />} />
       </Routes>
     </Router>
@@ -498,4 +505,3 @@ function App() {
 }
 
 export default App;
-

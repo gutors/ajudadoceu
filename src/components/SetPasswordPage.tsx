@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -20,7 +19,6 @@ export function SetPasswordPage() {
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const hash = window.location.hash;
@@ -30,7 +28,7 @@ export function SetPasswordPage() {
     if (token) {
       setAccessToken(token);
     } else {
-      setError('Token de acesso não encontrado. Por favor, use o link enviado para o seu e-mail.');
+      setError('Token de acesso não encontrado ou inválido. Por favor, use o link enviado para o seu e-mail.');
     }
   }, []);
 
@@ -59,11 +57,11 @@ export function SetPasswordPage() {
     try {
       await updateUserPassword({ password, accessToken });
 
-      setMessage('Senha definida com sucesso! Você será redirecionado para o login em breve.');
+      setMessage('Senha definida com sucesso! Você será redirecionado em breve.');
       
       setTimeout(() => {
-        navigate('/'); // Navega para a raiz, que cuidará do login
-      }, 5000);
+        window.location.assign('/'); // Recarrega a aplicação na raiz
+      }, 3000);
 
     } catch (err: any) {
       setError(err.message);
