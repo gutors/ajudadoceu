@@ -5,6 +5,7 @@ import { Label } from '@/components/ui/label';
 import luaIcon from '../assets/lua-icon.png';
 import { Eye, EyeOff } from 'lucide-react';
 import { updateUserPassword } from '@/lib/api';
+import { supabase } from '@/lib/supabaseClient';
 
 /**
  * @description
@@ -15,21 +16,37 @@ export function SetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [isSessionReady, setIsSessionReady] = useState(false);
 
   useEffect(() => {
-    const hash = window.location.hash;
-    const params = new URLSearchParams(hash.substring(1)); // Remove the '#'
-    const token = params.get('token');
+    // When the page loads, Supabase client detects the recovery token in the URL
+    // and fires a PASSWORD_RECOVERY event. We listen for that to enable the form.
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'PASSWORD_RECOVERY') {
+        if (session) {
+          // This event confirms the user is in the recovery flow.
+          // The session is now active, and they can update their password.
+          setIsSessionReady(true);
+        }
+      }
+    });
 
-    if (token) {
-      setAccessToken(token);
-    } else {
-      setError('Token de acesso não encontrado ou inválido. Por favor, use o link enviado para o seu e-mail.');
+    // It's good practice to also check for errors passed in the URL hash.
+    const hash = window.location.hash;
+    const params = new URLSearchParams(hash.substring(1));
+    const errorParam = params.get('error');
+    const errorDescription = params.get('error_description');
+
+    if (errorParam) {
+      setError(errorDescription || 'Ocorreu um erro na autenticação.');
     }
+
+    return () => {
+      authListener.subscription.unsubscribe();
+    };
   }, []);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -42,8 +59,8 @@ export function SetPasswordPage() {
       return;
     }
 
-    if (!accessToken) {
-      setError('Token de acesso inválido. Não é possível definir a senha.');
+    if (!isSessionReady) {
+      setError('Sessão de autenticação não encontrada. O link pode ter expirado.');
       return;
     }
 
@@ -55,7 +72,7 @@ export function SetPasswordPage() {
     setLoading(true);
 
     try {
-      await updateUserPassword({ password, accessToken });
+      await updateUserPassword({ password });
 
       setMessage('Senha definida com sucesso! Você será redirecionado em breve.');
       
@@ -92,7 +109,7 @@ export function SetPasswordPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 placeholder="Digite sua nova senha (mín. 6 caracteres)"
-                disabled={loading || !!message}
+                disabled={loading || !!message || !isSessionReady}
                 className="pr-10" // Adiciona espaço para o ícone
               />
               <Button
@@ -117,7 +134,7 @@ export function SetPasswordPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 placeholder="Confirme sua nova senha"
-                disabled={loading || !!message}
+                disabled={loading || !!message || !isSessionReady}
                 className="pr-10" // Adiciona espaço para o ícone
               />
               <Button
@@ -136,7 +153,7 @@ export function SetPasswordPage() {
           {error && <p className="resultado desfavoravel" style={{ marginBottom: '20px' }}>{error}</p>}
           {message && <p className="resultado favoravel" style={{ marginBottom: '20px' }}>{message}</p>}
           
-          <Button type="submit" className="btn" disabled={loading || !accessToken || !!message}>
+          <Button type="submit" className="btn" disabled={loading || !isSessionReady || !!message}>
             {loading ? 'Salvando...' : 'Salvar Senha e Acessar'}
           </Button>
         </form>

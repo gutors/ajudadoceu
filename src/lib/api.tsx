@@ -8,18 +8,8 @@ export interface UpdatePasswordData {
   accessToken: string;
 }
 
-export async function updateUserPassword(data: UpdatePasswordData): Promise<any> {
-  const { password, accessToken } = data;
-
-  // Set the session for this request
-  const { error: sessionError } = await supabase.auth.setSession({
-    access_token: accessToken,
-    refresh_token: '' // Refresh token is not needed here
-  });
-
-  if (sessionError) {
-    throw new Error(sessionError.message || "Ocorreu um erro ao autenticar.");
-  }
+export async function updateUserPassword(data: { password: string }): Promise<any> {
+  const { password } = data;
 
   const { data: responseData, error } = await supabase.auth.updateUser({
     password: password,
@@ -30,11 +20,9 @@ export async function updateUserPassword(data: UpdatePasswordData): Promise<any>
     throw new Error(errorMessage);
   }
 
-  // Clear the session after the password is updated
-  await supabase.auth.signOut();
-
   return responseData;
 }
+
 
 export async function requestPasswordReset(email: string): Promise<void> {
   const { error } = await supabase.auth.resetPasswordForEmail(email, {
