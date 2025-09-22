@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import luaIcon from '../assets/lua-icon.png';
-
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
+import { Eye, EyeOff } from 'lucide-react';
+import { updateUserPassword } from '@/lib/api';
 
 /**
  * @description
@@ -14,6 +14,8 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL
 export function SetPasswordPage() {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -55,21 +57,7 @@ export function SetPasswordPage() {
     setLoading(true);
 
     try {
-      // IMPORTANTE: Substitua '<YOUR_SUPABASE_PROJECT_REF>' pelo ID de referência do seu projeto Supabase.
-      const response = await fetch(`${supabaseUrl}/functions/v1/set-user-password`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${accessToken}`,
-        },
-        body: JSON.stringify({ password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Ocorreu um erro ao definir sua senha.');
-      }
+      await updateUserPassword({ password, accessToken });
 
       setMessage('Senha definida com sucesso! Você será redirecionado para o login em breve.');
       
@@ -98,27 +86,53 @@ export function SetPasswordPage() {
         <form onSubmit={handleSubmit}>
           <div className="form-group">
             <Label htmlFor="password">Nova Senha</Label>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              placeholder="Digite sua nova senha (mín. 6 caracteres)"
-              disabled={loading || !!message}
-            />
+            <div className="relative">
+              <Input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                placeholder="Digite sua nova senha (mín. 6 caracteres)"
+                disabled={loading || !!message}
+                className="pr-10" // Adiciona espaço para o ícone
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute inset-y-0 right-0 px-3 py-2 text-muted-foreground hover:bg-transparent"
+                onClick={() => setShowPassword(!showPassword)}
+                aria-label={showPassword ? "Esconder senha" : "Mostrar senha"}
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </Button>
+            </div>
           </div>
           <div className="form-group">
             <Label htmlFor="confirm-password">Confirmar Senha</Label>
-            <Input
-              id="confirm-password"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              required
-              placeholder="Confirme sua nova senha"
-              disabled={loading || !!message}
-            />
+            <div className="relative">
+              <Input
+                id="confirm-password"
+                type={showConfirmPassword ? 'text' : 'password'}
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                placeholder="Confirme sua nova senha"
+                disabled={loading || !!message}
+                className="pr-10" // Adiciona espaço para o ícone
+              />
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="absolute inset-y-0 right-0 px-3 py-2 text-muted-foreground hover:bg-transparent"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                aria-label={showConfirmPassword ? "Esconder senha" : "Mostrar senha"}
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </Button>
+            </div>
           </div>
           
           {error && <p className="resultado desfavoravel" style={{ marginBottom: '20px' }}>{error}</p>}
