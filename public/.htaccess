@@ -1,0 +1,12 @@
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  # Defina a base para o diretório raiz
+  RewriteBase /
+  
+  # Não reescreva requisições para arquivos ou diretórios existentes
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  
+  # Redirecione todas as outras requisições para o index.html na raiz
+  RewriteRule . /index.html [L]
+</IfModule>
