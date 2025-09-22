@@ -23,7 +23,7 @@ export function SetPasswordPage() {
   useEffect(() => {
     const hash = window.location.hash;
     const params = new URLSearchParams(hash.substring(1)); // Remove the '#'
-    const token = params.get('access_token');
+    const token = params.get('token');
 
     if (token) {
       setAccessToken(token);

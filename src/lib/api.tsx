@@ -11,17 +11,27 @@ export interface UpdatePasswordData {
 export async function updateUserPassword(data: UpdatePasswordData): Promise<any> {
   const { password, accessToken } = data;
 
-  const { data: responseData, error } = await supabase.functions.invoke('set-user-password', {
-    body: { password },
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-    },
+  // Set the session for this request
+  const { error: sessionError } = await supabase.auth.setSession({
+    access_token: accessToken,
+    refresh_token: '' // Refresh token is not needed here
+  });
+
+  if (sessionError) {
+    throw new Error(sessionError.message || "Ocorreu um erro ao autenticar.");
+  }
+
+  const { data: responseData, error } = await supabase.auth.updateUser({
+    password: password,
   });
 
   if (error) {
-    const errorMessage = error.context?.body?.error || error.message || "Ocorreu um erro ao atualizar sua senha.";
+    const errorMessage = error.message || "Ocorreu um erro ao atualizar sua senha.";
     throw new Error(errorMessage);
   }
+
+  // Clear the session after the password is updated
+  await supabase.auth.signOut();
 
   return responseData;
 }
