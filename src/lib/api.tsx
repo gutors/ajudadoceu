@@ -1,8 +1,5 @@
 import { supabase } from './supabaseClient';
 
-// Client API Key para acesso as EdgeFunctions
-const clientApiKey = import.meta.env.VITE_CLIENT_API_KEY
-
 export interface UpdatePasswordData {
   password: string;
   accessToken: string;

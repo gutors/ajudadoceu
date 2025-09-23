@@ -6,6 +6,7 @@ import { AstrologicalData, DailyData, LFCPeriod, MercurioRetrogrado, Eclipse } f
 import luaIcon from './assets/lua-icon.png';
 import { SetPasswordPage } from './components/SetPasswordPage';
 import { ForgotPasswordPage } from './components/ForgotPasswordPage';
+import { handleNotificationPermission } from './lib/push';
 
 // Dados astrológicos diários completos (serão carregados de um JSON)
 let dadosDiarios: AstrologicalData | null = null;
@@ -366,6 +367,7 @@ function MainApp() {
           <img src={luaIcon} alt="Lua" width="40" height="40" />
           Ajuda do <span>Céu</span>
         </a>
+        <button onClick={handleNotificationPermission} className="btn">Ativar Notificações</button>
       </header>
 
       <div className="tabs">
