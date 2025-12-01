@@ -1,13 +1,14 @@
 self.addEventListener('install', (event) => {
   console.log('Service worker installing...');
   event.waitUntil(
-    caches.open('ajuda-do-ceu-cache').then((cache) => {
+    caches.open('ajuda-do-ceu-cache-v2').then((cache) => {
       return cache.addAll([
         '/',
         '/index.html',
         '/manifest.json',
         '/favicon.png',
-        '/vite.svg'
+        '/vite.svg',
+        '/dados_diarios_completos.json'
       ]);
     })
   );
@@ -15,7 +16,21 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   console.log('Service worker activating...');
-  event.waitUntil(self.clients.claim());
+  const cacheWhitelist = ['ajuda-do-ceu-cache-v2'];
+  event.waitUntil(
+    Promise.all([
+      self.clients.claim(),
+      caches.keys().then((cacheNames) => {
+        return Promise.all(
+          cacheNames.map((cacheName) => {
+            if (cacheWhitelist.indexOf(cacheName) === -1) {
+              return caches.delete(cacheName);
+            }
+          })
+        );
+      })
+    ])
+  );
 });
 
 self.addEventListener('fetch', (event) => {
